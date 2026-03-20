@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Família Abreu</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+  <script src="data.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f7f4ef;
+      --surface: #ffffff;
+      --text: #1a1714;
+      --text-muted: #7a7570;
+      --accent: #8b6f47;
+      --accent-light: #c4a882;
+      --accent-faint: #ede8e0;
+      --spouse: #b08060;
+      --line: #d4c9b8;
+      --line-hover: #8b6f47;
+      --shadow: 0 2px 12px rgba(0,0,0,0.08);
+      --node-w: 140px;
+      --node-h: 52px;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      overflow: hidden;
+    }
+
+    /* ── Header ── */
+    header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 24px;
+      background: rgba(247, 244, 239, 0.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .header-title {
+      font-family: 'Lora', serif;
+      font-size: 1.15rem;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      color: var(--text);
+    }
+
+    .header-sub {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      font-weight: 300;
+      margin-top: 1px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .btn {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 12px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--surface);
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      border-color: var(--accent-light);
+      color: var(--accent);
+      background: var(--accent-faint);
+    }
+
+    .btn svg { flex-shrink: 0; }
+
+    /* ── Search ── */
+    .search-wrap {
+      position: relative;
+    }
+
+    #search {
+      padding: 6px 10px 6px 30px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--surface);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.78rem;
+      color: var(--text);
+      width: 180px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    #search:focus { border-color: var(--accent-light); }
+    #search::placeholder { color: var(--text-muted); }
+
+    .search-icon {
+      position: absolute;
+      left: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      color: var(--text-muted);
+    }
+
+    /* ── Canvas ── */
+    #canvas {
+      width: 100%;
+      height: 100%;
+      padding-top: 56px;
+      cursor: grab;
+    }
+
+    #canvas:active { cursor: grabbing; }
+
+    svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* ── Links ── */
+    .link {
+      fill: none;
+      stroke: var(--line);
+      stroke-width: 1.5;
+      transition: stroke 0.2s;
+    }
+
+    /* ── Nodes ── */
+    .node { cursor: pointer; }
+
+    .node-card {
+      rx: 8;
+      ry: 8;
+      fill: var(--surface);
+      stroke: var(--line);
+      stroke-width: 1;
+      transition: all 0.2s;
+      filter: drop-shadow(0 1px 4px rgba(0,0,0,0.07));
+    }
+
+    .node-card.root {
+      fill: var(--accent);
+      stroke: var(--accent);
+    }
+
+    .node-card.highlighted {
+      stroke: var(--accent);
+      stroke-width: 2;
+      filter: drop-shadow(0 2px 8px rgba(139,111,71,0.25));
+    }
+
+    .node-card.dimmed {
+      opacity: 0.25;
+    }
+
+    .node-name {
+      font-family: 'Lora', serif;
+      font-size: 11.5px;
+      font-weight: 600;
+      fill: var(--text);
+      pointer-events: none;
+    }
+
+    .node-name.root { fill: #fff; }
+
+    .node-spouse {
+      font-size: 9.5px;
+      font-weight: 300;
+      fill: var(--spouse);
+      pointer-events: none;
+      font-style: italic;
+    }
+
+    .node-spouse.root { fill: rgba(255,255,255,0.8); }
+
+    /* ── Collapse indicator ── */
+    .collapse-btn {
+      cursor: pointer;
+    }
+
+    .collapse-circle {
+      fill: var(--bg);
+      stroke: var(--accent-light);
+      stroke-width: 1.5;
+      transition: all 0.15s;
+    }
+
+    .collapse-circle:hover {
+      fill: var(--accent-faint);
+      stroke: var(--accent);
+    }
+
+    .collapse-text {
+      fill: var(--accent);
+      font-size: 9px;
+      font-weight: 500;
+      pointer-events: none;
+      font-family: 'Inter', sans-serif;
+    }
+
+    /* ── Legend ── */
+    .legend {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      z-index: 100;
+      background: rgba(247,244,239,0.92);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      line-height: 1.8;
+    }
+
+    .legend-row { display: flex; align-items: center; gap: 7px; }
+    .legend-swatch {
+      width: 10px; height: 10px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
+    /* ── Tooltip ── */
+    #tooltip {
+      position: fixed;
+      z-index: 200;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px 14px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s;
+      font-size: 0.78rem;
+      box-shadow: var(--shadow);
+      max-width: 200px;
+    }
+
+    #tooltip.show { opacity: 1; }
+
+    .tt-name {
+      font-family: 'Lora', serif;
+      font-weight: 600;
+      font-size: 0.88rem;
+      margin-bottom: 4px;
+    }
+
+    .tt-row {
+      color: var(--text-muted);
+      font-size: 0.72rem;
+      line-height: 1.5;
+    }
+
+    /* ── Geração badge ── */
+    .gen-label {
+      font-size: 9px;
+      font-weight: 500;
+      font-family: 'Inter', sans-serif;
+      fill: var(--text-muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    /* ── Info banner ── */
+    .info-bar {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 100;
+      background: rgba(247,244,239,0.92);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      line-height: 1.8;
+      text-align: right;
+    }
+
+    .info-bar span { color: var(--accent); font-weight: 500; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="header-title">Família Abreu</div>
+    <div class="header-sub">Pedro Filipe de Abreu &amp; Francisca Cândida de Jesus</div>
+  </div>
+  <div class="controls">
+    <div class="search-wrap">
+      <svg class="search-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+      </svg>
+      <input id="search" type="text" placeholder="Buscar pessoa…" autocomplete="off" />
+    </div>
+    <button class="btn" id="btn-expand">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+      Expandir tudo
+    </button>
+    <button class="btn" id="btn-reset">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+      Centralizar
+    </button>
+  </div>
+</header>
+
+<div id="canvas"></div>
+
+<div id="tooltip">
+  <div class="tt-name" id="tt-name"></div>
+  <div class="tt-row" id="tt-spouse"></div>
+  <div class="tt-row" id="tt-children"></div>
+  <div class="tt-row" id="tt-gen"></div>
+</div>
+
+<div class="legend">
+  <div class="legend-row"><div class="legend-swatch" style="background:#8b6f47"></div> Raiz da família</div>
+  <div class="legend-row"><div class="legend-swatch" style="background:#fff;border:1px solid #d4c9b8"></div> Descendentes</div>
+  <div class="legend-row" style="margin-top:4px;font-size:0.65rem">
+    Scroll para zoom · Arrastar para mover<br/>
+    Clique no nó para expandir/recolher
+  </div>
+</div>
+
+<div class="info-bar" id="info-bar">
+  <span id="count-visible">—</span> pessoas visíveis
+</div>
+
+<script>
+// ── Constants ──────────────────────────────────────────────
+const W_NODE = 144, H_NODE = 52, H_GAP = 72, V_GAP = 26;
+const GEN_NAMES = ['Raiz', '2ª geração', '3ª geração', '4ª geração', '5ª geração'];
+
+// ── State ──────────────────────────────────────────────────
+let root, svg, gLinks, gNodes, zoom, simulation;
+let collapsedIds = new Set();
+
+// ── Init ───────────────────────────────────────────────────
+function init() {
+  const container = document.getElementById('canvas');
+  const W = container.clientWidth;
+  const H = container.clientHeight;
+
+  svg = d3.select('#canvas').append('svg')
+    .attr('width', W).attr('height', H);
+
+  const defs = svg.append('defs');
+  // Subtle grain texture
+  const filter = defs.append('filter').attr('id', 'grain');
+  filter.append('feTurbulence').attr('type','fractalNoise').attr('baseFrequency','0.65').attr('numOctaves','3').attr('stitchTiles','stitch');
+  filter.append('feColorMatrix').attr('type','saturate').attr('values','0');
+  const comp = filter.append('feComposite').attr('in2','SourceGraphic').attr('operator','in');
+
+  // Background
+  svg.append('rect').attr('width','100%').attr('height','100%').attr('fill','var(--bg)');
+
+  zoom = d3.zoom()
+    .scaleExtent([0.08, 2.5])
+    .on('zoom', (e) => {
+      gRoot.attr('transform', e.transform);
+    });
+
+  svg.call(zoom);
+
+  const gRoot = svg.append('g');
+  gLinks = gRoot.append('g').attr('class', 'links');
+  gNodes = gRoot.append('g').attr('class', 'nodes');
+
+  root = d3.hierarchy(FAMILY_DATA);
+
+  // Collapse below level 2 by default for clean initial view
+  root.descendants().forEach(d => {
+    if (d.depth > 1 && d.children) {
+      d._children = d.children;
+      d.children = null;
+      collapsedIds.add(nodeId(d));
+    }
+  });
+
+  update();
+
+  // Initial zoom to fit
+  requestAnimationFrame(() => fitView());
+
+  // Events
+  document.getElementById('btn-reset').addEventListener('click', fitView);
+  document.getElementById('btn-expand').addEventListener('click', expandAll);
+  document.getElementById('search').addEventListener('input', onSearch);
+
+  window.addEventListener('resize', () => {
+    svg.attr('width', container.clientWidth).attr('height', container.clientHeight);
+  });
+}
+
+// ── Node identity ──────────────────────────────────────────
+function nodeId(d) {
+  return d.ancestors().map(a => a.data.name).reverse().join('>');
+}
+
+// ── Tree layout ────────────────────────────────────────────
+const treeLayout = d3.tree()
+  .nodeSize([W_NODE + H_GAP, H_NODE + V_GAP])
+  .separation((a, b) => a.parent === b.parent ? 1 : 1.25);
+
+// ── Update ─────────────────────────────────────────────────
+function update(source) {
+  treeLayout(root);
+
+  const nodes = root.descendants();
+  const links = root.links();
+
+  // ── Links ──
+  const link = gLinks.selectAll('.link').data(links, d => nodeId(d.target));
+
+  link.enter().append('path')
+    .attr('class', 'link')
+    .attr('d', d3.linkHorizontal().x(d => d.y).y(d => d.x))
+    .style('opacity', 0)
+    .transition().duration(350)
+    .style('opacity', 1)
+    .attr('d', d3.linkHorizontal().x(d => d.y).y(d => d.x));
+
+  link.transition().duration(350)
+    .attr('d', d3.linkHorizontal().x(d => d.y).y(d => d.x))
+    .style('opacity', 1);
+
+  link.exit().transition().duration(200).style('opacity', 0).remove();
+
+  // ── Nodes ──
+  const node = gNodes.selectAll('.node').data(nodes, d => nodeId(d));
+
+  const nodeEnter = node.enter().append('g')
+    .attr('class', 'node')
+    .attr('transform', d => `translate(${d.y},${d.x})`)
+    .style('opacity', 0)
+    .on('click', onClick)
+    .on('mouseenter', onHover)
+    .on('mouseleave', onLeave);
+
+  // Card background
+  nodeEnter.append('rect')
+    .attr('class', d => 'node-card' + (d.depth === 0 ? ' root' : ''))
+    .attr('x', -W_NODE / 2)
+    .attr('y', -H_NODE / 2)
+    .attr('width', W_NODE)
+    .attr('height', H_NODE)
+    .attr('rx', 8).attr('ry', 8);
+
+  // Name
+  nodeEnter.append('text')
+    .attr('class', d => 'node-name' + (d.depth === 0 ? ' root' : ''))
+    .attr('text-anchor', 'middle')
+    .attr('dy', d => d.data.spouse ? '-5' : '4')
+    .text(d => truncate(d.data.name, 16));
+
+  // Spouse
+  nodeEnter.append('text')
+    .attr('class', d => 'node-spouse' + (d.depth === 0 ? ' root' : ''))
+    .attr('text-anchor', 'middle')
+    .attr('dy', '10')
+    .text(d => d.data.spouse ? '♥ ' + truncate(d.data.spouse, 14) : '');
+
+  // Collapse indicator
+  nodeEnter.append('g')
+    .attr('class', 'collapse-btn')
+    .attr('transform', `translate(${W_NODE / 2 + 1}, 0)`)
+    .call(g => {
+      g.append('circle').attr('class', 'collapse-circle').attr('r', 9);
+      g.append('text').attr('class', 'collapse-text').attr('text-anchor', 'middle').attr('dy', '3.5');
+    });
+
+  nodeEnter.transition().duration(350)
+    .attr('transform', d => `translate(${d.y},${d.x})`)
+    .style('opacity', 1);
+
+  // Update existing
+  const nodeUpdate = node.merge(nodeEnter);
+
+  nodeUpdate.transition().duration(350)
+    .attr('transform', d => `translate(${d.y},${d.x})`)
+    .style('opacity', 1);
+
+  nodeUpdate.select('.node-name')
+    .attr('dy', d => d.data.spouse ? '-5' : '4')
+    .text(d => truncate(d.data.name, 16));
+
+  nodeUpdate.select('.node-spouse')
+    .text(d => d.data.spouse ? '♥ ' + truncate(d.data.spouse, 14) : '');
+
+  nodeUpdate.select('.collapse-circle')
+    .style('display', d => (d.children || d._children) ? null : 'none');
+
+  nodeUpdate.select('.collapse-text')
+    .text(d => {
+      if (!d.children && !d._children) return '';
+      if (d._children) return '+';
+      return '−';
+    });
+
+  node.exit().transition().duration(200).style('opacity', 0).remove();
+
+  // Update counter
+  document.getElementById('count-visible').textContent = nodes.length;
+}
+
+// ── Click ──────────────────────────────────────────────────
+function onClick(event, d) {
+  if (d._children) {
+    d.children = d._children;
+    d._children = null;
+    collapsedIds.delete(nodeId(d));
+  } else if (d.children) {
+    d._children = d.children;
+    d.children = null;
+    collapsedIds.add(nodeId(d));
+  }
+  update(d);
+}
+
+// ── Hover ──────────────────────────────────────────────────
+function onHover(event, d) {
+  const tt = document.getElementById('tooltip');
+  document.getElementById('tt-name').textContent = d.data.name;
+  document.getElementById('tt-spouse').textContent = d.data.spouse ? '♥ ' + d.data.spouse : '';
+  const ch = (d.children || d._children || []);
+  document.getElementById('tt-children').textContent = ch.length ? ch.length + ' filho(s)' : 'Sem filhos registrados';
+  document.getElementById('tt-gen').textContent = GEN_NAMES[d.depth] || (d.depth + 1 + 'ª geração');
+  tt.classList.add('show');
+  moveTt(event);
+}
+
+function onLeave() {
+  document.getElementById('tooltip').classList.remove('show');
+}
+
+document.addEventListener('mousemove', e => {
+  if (document.getElementById('tooltip').classList.contains('show')) moveTt(e);
+});
+
+function moveTt(e) {
+  const tt = document.getElementById('tooltip');
+  const x = e.clientX + 14, y = e.clientY - 10;
+  tt.style.left = Math.min(x, window.innerWidth - 220) + 'px';
+  tt.style.top = Math.min(y, window.innerHeight - 120) + 'px';
+}
+
+// ── Fit view ───────────────────────────────────────────────
+function fitView() {
+  const container = document.getElementById('canvas');
+  const W = container.clientWidth, H = container.clientHeight - 56;
+  const nodes = root.descendants();
+  const xs = nodes.map(d => d.y), ys = nodes.map(d => d.x);
+  const x0 = Math.min(...xs), x1 = Math.max(...xs);
+  const y0 = Math.min(...ys), y1 = Math.max(...ys);
+  const pw = x1 - x0 + W_NODE + 80, ph = y1 - y0 + H_NODE + 80;
+  const scale = Math.min(W / pw, H / ph, 1.2);
+  const tx = W / 2 - scale * (x0 + x1) / 2;
+  const ty = (H / 2 + 56) - scale * (y0 + y1) / 2;
+  svg.transition().duration(600).call(
+    zoom.transform, d3.zoomIdentity.translate(tx, ty).scale(scale)
+  );
+}
+
+// ── Expand all ─────────────────────────────────────────────
+function expandAll() {
+  root.descendants().forEach(d => {
+    if (d._children) { d.children = d._children; d._children = null; }
+  });
+  collapsedIds.clear();
+  update();
+  setTimeout(fitView, 420);
+}
+
+// ── Search ─────────────────────────────────────────────────
+let searchTimeout;
+function onSearch(e) {
+  clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(() => {
+    const q = e.target.value.trim().toLowerCase();
+    if (!q) {
+      gNodes.selectAll('.node-card').classed('highlighted', false).classed('dimmed', false);
+      return;
+    }
+    gNodes.selectAll('.node').each(function(d) {
+      const match = d.data.name.toLowerCase().includes(q) ||
+                    (d.data.spouse && d.data.spouse.toLowerCase().includes(q));
+      d3.select(this).select('.node-card')
+        .classed('highlighted', match)
+        .classed('dimmed', !match);
+    });
+    // Pan to first match
+    const matched = root.descendants().find(d =>
+      d.data.name.toLowerCase().includes(q) ||
+      (d.data.spouse && d.data.spouse.toLowerCase().includes(q))
+    );
+    if (matched) {
+      const container = document.getElementById('canvas');
+      const W = container.clientWidth, H = container.clientHeight;
+      svg.transition().duration(500).call(
+        zoom.transform, d3.zoomIdentity
+          .translate(W / 2 - matched.y, H / 2 - matched.x)
+          .scale(1)
+      );
+    }
+  }, 200);
+}
+
+// ── Helpers ────────────────────────────────────────────────
+function truncate(str, len) {
+  return str && str.length > len ? str.slice(0, len - 1) + '…' : str;
+}
+
+// ── Start ──────────────────────────────────────────────────
+init();
+</script>
+</body>
+</html>
