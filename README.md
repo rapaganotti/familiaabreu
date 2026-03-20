@@ -1,44 +1,47 @@
 # 🌳 Família Abreu
 
-Árvore genealógica interativa da família Abreu.
+Árvore genealógica interativa — Pedro Filipe de Abreu & Francisca Cândida de Jesus.
 
-## Como funciona
+## Navegação
 
-- **Zoom**: scroll do mouse
-- **Mover**: arrastar
-- **Expandir/recolher**: clicar em qualquer nó
-- **Buscar**: campo de busca no topo (busca por nome ou cônjuge)
-- **Centralizar**: botão "Centralizar" no topo
+| Ação | Como |
+|------|------|
+| Zoom | Scroll do mouse |
+| Mover | Arrastar |
+| Expandir/recolher filhos | Clicar no nó |
+| Centralizar | Botão "Centralizar" |
+| Buscar | Campo de busca — destaca **todos** os resultados |
 
-## Estrutura do projeto
+## Estrutura
 
 ```
 familia-abreu/
-├── index.html   # Página principal
-├── data.js      # Dados da árvore genealógica
-└── README.md    # Este arquivo
+├── index.html   # Página
+├── data.js      # Dados da família (JSON)
+└── README.md
 ```
 
-## Como atualizar os dados
+## Atualizar dados
 
-Edite o arquivo `data.js`. Os dados seguem o formato JSON aninhado:
+Edite `data.js`. Formato:
 
 ```js
 const FAMILY_DATA = {
-  "name": "Nome da Pessoa",
-  "spouse": "Nome do Cônjuge",   // opcional
-  "children": [                  // opcional
-    { "name": "Filho 1" },
-    { "name": "Filho 2", "spouse": "Cônjuge", "children": [...] }
-  ]
+  "name": "Nome",
+  "spouse": "Cônjuge",      // opcional
+  "children": [...]          // opcional
 };
 ```
 
 ## Deploy no Vercel
 
-1. Suba os arquivos para um repositório no GitHub
-2. Acesse [vercel.com](https://vercel.com) e clique em **Add New → Project**
-3. Importe o repositório GitHub
-4. Clique em **Deploy** — não precisa de nenhuma configuração adicional
+1. Suba os 3 arquivos para um repositório GitHub
+2. [vercel.com](https://vercel.com) → **Add New → Project** → importe o repo
+3. Clique **Deploy** — zero configuração necessária
 
-O Vercel detecta automaticamente que é um projeto HTML estático.
+## Roadmap futuro
+
+- [ ] Fotos nos cartões
+- [ ] Formulário de cadastro (pessoa se inclui, você aprova)
+- [ ] Google Sheets como banco de dados
+- [ ] Unir os dois lados da família
