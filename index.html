@@ -15,6 +15,7 @@
   --card:#fff;
   --card-root:#3d2b1f;
   --spouse-bg:#faf7f3;
+  --spouse-unknown:#f0ebe3;
   --text:#1c1510;
   --muted:#8a7d72;
   --spouse-text:#7a5f4a;
@@ -25,115 +26,89 @@
   --border:#e2d9ce;
   --hi:#fff8f0;
   --hi-border:#e8a96a;
-  --pw:88px; --ph:40px;
-  --sw:70px; --sh:32px;
-  --cg:2px;
 }
 
 html,body{height:100%;background:var(--bg);font-family:'Inter',sans-serif;overflow:hidden}
 
-/* HEADER */
 header{
   position:fixed;inset:0 0 auto 0;z-index:100;height:46px;
   display:flex;align-items:center;justify-content:space-between;
   padding:0 16px;
-  background:rgba(245,242,237,.94);backdrop-filter:blur(10px);
+  background:rgba(245,242,237,.95);backdrop-filter:blur(10px);
   border-bottom:1px solid var(--border);
 }
-.logo{font-family:'Lora',serif;font-size:.95rem;font-weight:600}
-.logo em{font-style:italic;font-weight:400;font-size:.78rem;color:var(--muted);margin-left:6px}
+.logo{font-family:'Lora',serif;font-size:.95rem;font-weight:600;white-space:nowrap}
+.logo em{font-style:italic;font-weight:400;font-size:.76rem;color:var(--muted);margin-left:6px}
 .ctrls{display:flex;gap:6px;align-items:center}
-
-.sw-wrap{position:relative}
+.sw{position:relative}
 #search{
-  width:155px;padding:4px 8px 4px 26px;
+  width:148px;padding:4px 8px 4px 25px;
   border:1px solid var(--border);border-radius:5px;
-  background:#fff;font-family:'Inter',sans-serif;font-size:.73rem;color:var(--text);
+  background:#fff;font-family:'Inter',sans-serif;font-size:.72rem;color:var(--text);
   outline:none;transition:border-color .15s;
 }
 #search:focus{border-color:var(--accent-l)}
 #search::placeholder{color:var(--muted)}
-.ico{position:absolute;left:7px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
-
+.si{position:absolute;left:7px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
 .btn{
-  display:flex;align-items:center;gap:4px;
-  padding:4px 9px;border:1px solid var(--border);border-radius:5px;
-  background:#fff;color:var(--muted);font-size:.71rem;font-family:'Inter',sans-serif;
+  display:flex;align-items:center;gap:4px;padding:4px 9px;
+  border:1px solid var(--border);border-radius:5px;
+  background:#fff;color:var(--muted);font-size:.7rem;font-family:'Inter',sans-serif;
   cursor:pointer;white-space:nowrap;transition:all .15s;
 }
 .btn:hover{border-color:var(--accent-l);color:var(--accent);background:var(--hi)}
-#sc{font-size:.7rem;color:var(--accent);font-weight:500;min-width:70px;text-align:right;display:none}
+#sc{font-size:.7rem;color:var(--accent);font-weight:500;display:none;white-space:nowrap}
 
-/* CANVAS */
 #cv{width:100%;height:100%;padding-top:46px}
 #cv svg{width:100%;height:100%;cursor:grab}
 #cv svg:active{cursor:grabbing}
 
-/* LOADING */
 #loading{
   position:fixed;inset:0;z-index:300;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   background:var(--bg);gap:14px;
 }
-.spinner{
-  width:32px;height:32px;border:2px solid var(--border);
-  border-top-color:var(--accent);border-radius:50%;
-  animation:spin .7s linear infinite;
-}
-@keyframes spin{to{transform:rotate(360deg)}}
-.loading-text{font-size:.8rem;color:var(--muted)}
+.spin{width:28px;height:28px;border:2px solid var(--border);border-top-color:var(--accent);
+  border-radius:50%;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.lt{font-size:.78rem;color:var(--muted)}
 
 /* SVG */
-.link{fill:none;stroke:var(--line);stroke-width:1.1}
-.couple-bar{fill:none;stroke:var(--line-couple);stroke-width:1}
+.edge{fill:none;stroke:var(--line);stroke-width:1.1}
+.cbar{fill:none;stroke:var(--line-couple);stroke-width:.9}
 
-.p-card{fill:var(--card);stroke:var(--border);stroke-width:.8;cursor:default}
-.p-card.root{fill:var(--card-root);stroke:var(--card-root)}
-.p-card.hi{fill:var(--hi);stroke:var(--hi-border);stroke-width:1.5}
-.p-card.dim{opacity:.15}
-.p-card:hover:not(.dim){stroke:var(--accent-l);filter:drop-shadow(0 1px 5px rgba(124,82,48,.14))}
+.pc{fill:var(--card);stroke:var(--border);stroke-width:.8}
+.pc.root{fill:var(--card-root);stroke:var(--card-root)}
+.pc.hi{fill:var(--hi);stroke:var(--hi-border);stroke-width:1.5}
+.pc.dim{opacity:.13}
 
-.s-card{fill:var(--spouse-bg);stroke:var(--border);stroke-width:.7}
-.s-card.root{fill:#56362a;stroke:#56362a}
-.s-card.dim{opacity:.15}
+.sc{stroke-width:.7}
+.sc.known{fill:var(--spouse-bg);stroke:var(--border)}
+.sc.unknown{fill:var(--spouse-unknown);stroke:var(--border);stroke-dasharray:3 2}
+.sc.root{fill:#56362a;stroke:#56362a}
+.sc.dim{opacity:.13}
 
-.n-name{
-  font-family:'Lora',serif;font-size:10px;font-weight:600;
-  fill:var(--text);pointer-events:none;dominant-baseline:middle;
-}
-.n-name.root{fill:#fff}
-.n-name.hi{fill:var(--accent)}
+.nm{font-family:'Lora',serif;font-size:10px;font-weight:600;fill:var(--text);pointer-events:none;dominant-baseline:middle}
+.nm.root{fill:#fff}
+.nm.hi{fill:var(--accent)}
+.sn{font-size:8.5px;font-style:italic;fill:var(--spouse-text);pointer-events:none;dominant-baseline:middle}
+.sn.root{fill:rgba(255,255,255,.72)}
+.sn.unknown{fill:var(--muted)}
+.ml{font-size:6.5px;fill:var(--accent-l);pointer-events:none;dominant-baseline:middle}
 
-.s-name{
-  font-size:8.5px;font-weight:300;font-style:italic;
-  fill:var(--spouse-text);pointer-events:none;dominant-baseline:middle;
-}
-.s-name.root{fill:rgba(255,255,255,.7)}
-
-.m-label{
-  font-size:7px;fill:var(--accent-l);font-family:'Inter',sans-serif;
-  dominant-baseline:middle;pointer-events:none;
-}
-
-/* TOOLTIP */
 #tip{
   position:fixed;z-index:200;background:#fff;border:1px solid var(--border);
-  border-radius:7px;padding:8px 12px;pointer-events:none;opacity:0;
-  transition:opacity .12s;font-size:.73rem;
-  box-shadow:0 2px 10px rgba(0,0,0,.08);max-width:190px;
+  border-radius:7px;padding:8px 12px;pointer-events:none;opacity:0;transition:opacity .12s;
+  font-size:.72rem;box-shadow:0 2px 10px rgba(0,0,0,.08);max-width:190px;
 }
 #tip.on{opacity:1}
-#tip-name{font-family:'Lora',serif;font-weight:600;font-size:.83rem;margin-bottom:3px}
-#tip-rows{color:var(--muted);font-size:.69rem;line-height:1.7}
-#tip-rows span{color:var(--accent)}
+#tn{font-family:'Lora',serif;font-weight:600;font-size:.82rem;margin-bottom:3px}
+#tr{color:var(--muted);font-size:.68rem;line-height:1.7}
+#tr span{color:var(--accent)}
 
-/* BOTTOM BAR */
-.bar{
-  position:fixed;bottom:14px;z-index:100;
-  background:rgba(245,242,237,.9);backdrop-filter:blur(8px);
-  border:1px solid var(--border);border-radius:6px;
-  padding:6px 11px;font-size:.67rem;color:var(--muted);line-height:1.8;
-}
+.bar{position:fixed;bottom:14px;z-index:100;background:rgba(245,242,237,.9);
+  backdrop-filter:blur(8px);border:1px solid var(--border);border-radius:6px;
+  padding:6px 10px;font-size:.66rem;color:var(--muted);line-height:1.8}
 #bl{left:14px}
 #br{right:14px;text-align:right}
 #br b{color:var(--accent)}
@@ -141,20 +116,17 @@ header{
 </head>
 <body>
 
-<div id="loading">
-  <div class="spinner"></div>
-  <div class="loading-text">Carregando família…</div>
-</div>
+<div id="loading"><div class="spin"></div><div class="lt">Carregando família…</div></div>
 
 <header>
   <div class="logo">Família Abreu <em>Pedro Filipe × Francisca Cândida</em></div>
   <div class="ctrls">
-    <div class="sw-wrap">
-      <svg class="ico" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+    <div class="sw">
+      <svg class="si" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
       <input id="search" type="text" placeholder="Buscar nome…" autocomplete="off"/>
     </div>
     <span id="sc"></span>
-    <button class="btn" id="b-fit">
+    <button class="btn" id="bfit">
       <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
       Centralizar
     </button>
@@ -162,405 +134,397 @@ header{
 </header>
 
 <div id="cv"></div>
-
-<div id="tip">
-  <div id="tip-name"></div>
-  <div id="tip-rows"></div>
-</div>
-
-<div class="bar" id="bl">Scroll → zoom &nbsp;·&nbsp; Arrastar → navegar</div>
+<div id="tip"><div id="tn"></div><div id="tr"></div></div>
+<div class="bar" id="bl">Scroll → zoom &nbsp;·&nbsp; Arrastar → mover</div>
 <div class="bar" id="br"><b id="nv">—</b> pessoas</div>
 
 <script>
-// ═══════════════════════════════════════════
-// CONSTANTS
-// ═══════════════════════════════════════════
-const PW=88, PH=40, SW=70, SH=32, CG=2;
-const H_SEP=20;   // gap between sibling units
-const V_SEP=78;   // vertical gap between generations
-const GENS=['Raiz','2ª geração','3ª geração','4ª geração','5ª geração'];
+// ─────────────────────────────────────────────────────────
+// SIZING
+// ─────────────────────────────────────────────────────────
+const PW = 86, PH = 38;   // person card
+const SW = 68, SH = 30;   // spouse card
+const CG = 3;              // gap between person and spouse card
+const MG = 8;              // gap between marriages (2nd spouse from 1st)
+const VSEP = 80;           // vertical distance between generations
+const HSEP = 10;           // minimum horizontal gap between sibling subtrees
 
-// ═══════════════════════════════════════════
-// 1. READ EXCEL → BUILD TREE
-// ═══════════════════════════════════════════
-async function loadExcel() {
-  const resp = await fetch('arvoreabreu.xlsx');
-  const buf  = await resp.arrayBuffer();
-  const wb   = XLSX.read(buf, {type:'array'});
-  const ws   = wb.Sheets['Árvore'];
+const GENS = ['Raiz','2ª geração','3ª geração','4ª geração','5ª geração'];
+
+// ─────────────────────────────────────────────────────────
+// STEP 1 — LOAD EXCEL AND BUILD TREE
+// ─────────────────────────────────────────────────────────
+async function loadTree() {
+  const buf = await (await fetch('arvoreabreu.xlsx')).arrayBuffer();
+  const ws  = XLSX.read(buf, {type:'array'}).Sheets['Árvore'];
   const rows = XLSX.utils.sheet_to_json(ws, {defval: null});
-  return buildTree(rows);
-}
 
-function clean(v) {
-  if (v === null || v === undefined) return null;
-  const s = String(v).trim();
-  return s || null;
-}
-
-function buildTree(rows) {
   const nodes = {};
 
-  function getOrCreate(path, name, spouse) {
-    const key = path.join('>');
-    if (!nodes[key]) nodes[key] = {name, marriages: {}};
-    const spKey = spouse || '__none__';
-    if (!nodes[key].marriages[spKey])
-      nodes[key].marriages[spKey] = {spouse, children: []};
-    return {key, spKey};
+  function touch(path, name, spouse) {
+    const key = path.join('\x00');
+    if (!nodes[key]) nodes[key] = {name, marriages: new Map()};
+    const sk = spouse ?? '\x01none';
+    if (!nodes[key].marriages.has(sk))
+      nodes[key].marriages.set(sk, {spouse: spouse ?? null, children: []});
+    return {key, sk};
   }
 
   for (const row of rows) {
-    const levels = [];
-    for (let i = 1; i <= 5; i++) {
-      levels.push({
-        name:   clean(row[`Raiz_Nivel${i}`]),
-        spouse: clean(row[`Conjuge_Raiz_Nível${i}`])
-      });
-    }
-
-    let prevKey = null, prevSpKey = null;
-    for (let i = 0; i < levels.length; i++) {
-      const {name, spouse} = levels[i];
-      if (!name) break;
-      const path = levels.slice(0, i+1).map(l => l.name);
-      const {key, spKey} = getOrCreate(path, name, spouse);
-      if (prevKey !== null) {
-        const children = nodes[prevKey].marriages[prevSpKey].children;
-        if (!children.includes(key)) children.push(key);
+    const lvl = Array.from({length:5}, (_,i) => ({
+      name:   cv(row[`Raiz_Nivel${i+1}`]),
+      spouse: cv(row[`Conjuge_Raiz_Nível${i+1}`])
+    }));
+    let pk = null, psk = null;
+    for (let i = 0; i < 5; i++) {
+      if (!lvl[i].name) break;
+      const path = lvl.slice(0,i+1).map(l=>l.name);
+      const {key, sk} = touch(path, lvl[i].name, lvl[i].spouse);
+      if (pk) {
+        const ch = nodes[pk].marriages.get(psk).children;
+        if (!ch.includes(key)) ch.push(key);
       }
-      prevKey = key;
-      prevSpKey = spKey;
+      pk = key; psk = sk;
     }
   }
 
-  function toTree(key) {
+  function toTree(key, depth=0) {
     const n = nodes[key];
     return {
-      name: n.name,
-      marriages: Object.values(n.marriages).map(m => ({
+      name: n.name, depth,
+      marriages: [...n.marriages.values()].map(m => ({
         spouse: m.spouse,
-        children: m.children.map(toTree)
+        children: m.children.map(ck => toTree(ck, depth+1))
       }))
     };
   }
-
-  const rootKey = Object.keys(nodes).find(k => !k.includes('>'));
+  const rootKey = Object.keys(nodes).find(k => !k.includes('\x00'));
   return toTree(rootKey);
 }
 
-// ═══════════════════════════════════════════
-// 2. LAYOUT ENGINE
-// Each person node = {name, marriages:[{spouse, children}]}
-// We compute x,y for each person and store spouse offset info.
-// ═══════════════════════════════════════════
-let layoutNodes = [];
-
-function computeLayout(tree) {
-  layoutNodes = [];
-  let idCounter = 0;
-
-  // Returns subtree width
-  function measure(node, depth) {
-    const id = idCounter++;
-    const marriages = node.marriages || [{spouse:null,children:[]}];
-
-    // Measure each marriage's children subtree
-    const mData = marriages.map(m => {
-      const childMeasures = (m.children||[]).map(c => measure(c, depth+1));
-      const childrenW = childMeasures.length
-        ? childMeasures.reduce((s,c)=>s+c.w, 0) + H_SEP*(childMeasures.length-1)
-        : 0;
-      return {m, childMeasures, childrenW};
-    });
-
-    // Width of the couple unit itself
-    const spouseCount = marriages.filter(m=>m.spouse).length;
-    const coupleW = PW + marriages.reduce((s,m,i) =>
-      s + (m.spouse ? CG+SW : 0) + (i>0 ? H_SEP : 0), 0);
-
-    // Total children width across all marriages
-    const totalChildW = mData.reduce((s,md,i) =>
-      s + md.childrenW + (i>0&&md.childrenW>0 ? H_SEP : 0), 0);
-
-    const w = Math.max(coupleW, totalChildW, PW);
-
-    return {id, node, depth, mData, w};
-  }
-
-  function place(mo, cx) {
-    const {id, node, depth, mData} = mo;
-    const marriages = node.marriages || [{spouse:null,children:[]}];
-
-    // Build spouse x-offsets from person center
-    let cur = PW/2 + CG;
-    const spouseOffsets = marriages.map(m => {
-      if (!m.spouse) return null;
-      const ox = cur + SW/2;
-      cur += SW + CG + H_SEP;
-      return ox;
-    });
-
-    // Couple midpoints for child hanging
-    const coupleMids = marriages.map((m,i) =>
-      m.spouse ? cx + (PW/2 + CG + (spouseOffsets[i] - PW/2 - CG) / 2) : cx
-    );
-    // Simpler: midpoint = halfway between person center and spouse center
-    const coupleMids2 = marriages.map((m,i) => {
-      if (!m.spouse || spouseOffsets[i] === null) return cx;
-      return cx + spouseOffsets[i] / 2;  // halfway between 0 (person) and spouse offset
-    });
-
-    layoutNodes.push({
-      id, name: node.name, depth,
-      x: cx, y: depth * V_SEP,
-      marriages,
-      spouseOffsets,
-      coupleMids: coupleMids2
-    });
-
-    // Place children
-    mData.forEach((md, mi) => {
-      if (!md.childMeasures.length) return;
-      const mid = coupleMids2[mi];
-      const totalW = md.childMeasures.reduce((s,c)=>s+c.w,0)
-                   + H_SEP*(md.childMeasures.length-1);
-      let lx = mid - totalW/2;
-      md.childMeasures.forEach(cm => {
-        place(cm, lx + cm.w/2);
-        lx += cm.w + H_SEP;
-      });
-    });
-  }
-
-  const root = measure(tree, 0);
-  place(root, 0);
+function cv(v) {
+  if (v == null) return null;
+  const s = String(v).trim(); return s || null;
 }
 
-// ═══════════════════════════════════════════
-// 3. RENDER
-// ═══════════════════════════════════════════
+// ─────────────────────────────────────────────────────────
+// STEP 2 — LAYOUT
+//
+// Each tree node has one person card + N spouse cards side-by-side.
+// The "anchor" of a node is the CENTER of the person card.
+// Children of marriage[i] hang below coupleMid[i].
+//
+// We use a bottom-up width calculation, then top-down x assignment.
+// Key: each node's total footprint = max(coupleRowWidth, sumChildrenWidths).
+// ─────────────────────────────────────────────────────────
+
+function coupleRowWidth(node) {
+  // Width of person + all spouse cards for this node
+  const spouseCount = node.marriages.filter(m => m.spouse !== null).length;
+  // person card + (CG + spouse)*spouseCount + MG*(spouseCount-1 gaps between marriages if >1)
+  // But if unnamed spouse: still show a card (dashed)
+  let w = PW;
+  node.marriages.forEach((m, i) => {
+    w += CG + SW;                        // every marriage gets a spouse card slot
+    if (i < node.marriages.length - 1) w += MG; // gap between marriages
+  });
+  return w;
+}
+
+// Returns subtreeWidth for a node
+function measureNode(node) {
+  const marriages = node.marriages;
+
+  // For each marriage, measure children
+  const mInfo = marriages.map(m => {
+    const childInfos = m.children.map(measureNode);
+    const totalChildW = childInfos.length === 0 ? 0
+      : childInfos.reduce((s,c) => s+c.subtreeW, 0) + HSEP*(childInfos.length-1);
+    return {childInfos, totalChildW};
+  });
+
+  const totalAllChildW = mInfo.reduce((s,mi,i) =>
+    s + mi.totalChildW + (i>0 && mi.totalChildW>0 ? HSEP : 0), 0);
+
+  const selfW = coupleRowWidth(node);
+  const subtreeW = Math.max(selfW, totalAllChildW);
+
+  node._mInfo = mInfo;
+  node._subtreeW = subtreeW;
+  node._selfW = selfW;
+  return {subtreeW, node};
+}
+
+// Assign x,y given center x
+function placeNode(node, cx, depth) {
+  node._x = cx;
+  node._y = depth * VSEP;
+
+  // Compute x positions of each spouse card (offsets from person center)
+  // Person center = cx, person right edge = cx + PW/2
+  // Marriage 0 spouse starts at cx + PW/2 + CG, center at cx + PW/2 + CG + SW/2
+  // Marriage 1 spouse starts after MG gap
+  const spOffsets = []; // x-center of each spouse card
+  let cur = PW/2 + CG + SW/2;
+  node.marriages.forEach((m, i) => {
+    spOffsets.push(cx + cur - SW/2 + SW/2); // simplify: cx + offset
+    cur += SW + MG + CG;
+  });
+
+  // Recompute simply:
+  node._spouseX = [];
+  let spCursor = cx + PW/2 + CG;
+  node.marriages.forEach((m, i) => {
+    node._spouseX.push(spCursor + SW/2); // center of this spouse card
+    spCursor += SW + MG + CG;
+  });
+
+  // Couple midpoints: halfway between person center and spouse center
+  node._coupleMid = node.marriages.map((m, i) => {
+    if (m.spouse === null && node.marriages.length === 1) return cx; // solo, no spouse label
+    const spx = node._spouseX[i];
+    // midpoint between person left-center area and spouse
+    return (cx + spx) / 2;
+  });
+
+  // Place children of each marriage centered under couple midpoint
+  const mInfo = node._mInfo;
+  node.marriages.forEach((m, mi) => {
+    const {childInfos, totalChildW} = mInfo[mi];
+    if (!childInfos.length) return;
+    const mid = node._coupleMid[mi];
+    let lx = mid - totalChildW/2;
+    childInfos.forEach(ci => {
+      placeNode(ci.node, lx + ci.subtreeW/2, depth+1);
+      lx += ci.subtreeW + HSEP;
+    });
+  });
+}
+
+function layout(tree) {
+  measureNode(tree);
+  placeNode(tree, 0, 0);
+}
+
+// ─────────────────────────────────────────────────────────
+// STEP 3 — COLLECT FLAT ARRAYS FOR D3
+// ─────────────────────────────────────────────────────────
+let allNodes = [], allEdges = [];
+
+function flatten(node, parentMidX, parentY) {
+  allNodes.push(node);
+
+  if (parentMidX !== null) {
+    const my = (parentY + node._y) / 2;
+    allEdges.push(`M${parentMidX},${parentY+PH/2} C${parentMidX},${my} ${node._x},${my} ${node._x},${node._y-PH/2}`);
+  }
+
+  node.marriages.forEach((m, mi) => {
+    const mid = node._coupleMid[mi];
+    m.children.forEach(c => flatten(c, mid, node._y));
+  });
+}
+
+// ─────────────────────────────────────────────────────────
+// STEP 4 — RENDER
+// ─────────────────────────────────────────────────────────
 let svgEl, zoomB, gRoot, gL, gN;
 
 function initSVG() {
   const el = document.getElementById('cv');
   svgEl = d3.select('#cv').append('svg')
-    .attr('width', el.clientWidth)
-    .attr('height', el.clientHeight - 46);
-  svgEl.append('rect').attr('width','500%').attr('height','500%').attr('fill','var(--bg)');
-  zoomB = d3.zoom().scaleExtent([0.04,3])
-    .on('zoom', e => gRoot.attr('transform', e.transform));
+    .attr('width', el.clientWidth).attr('height', el.clientHeight-46);
+  svgEl.append('rect').attr('width','600%').attr('height','600%').attr('fill','var(--bg)');
+  zoomB = d3.zoom().scaleExtent([0.04,3]).on('zoom', e=>gRoot.attr('transform',e.transform));
   svgEl.call(zoomB);
   gRoot = svgEl.append('g');
   gL = gRoot.append('g');
   gN = gRoot.append('g');
-  window.addEventListener('resize', () => {
-    svgEl.attr('width', el.clientWidth).attr('height', el.clientHeight - 46);
+  window.addEventListener('resize', ()=>{
+    svgEl.attr('width',el.clientWidth).attr('height',el.clientHeight-46);
   });
 }
 
 function render(tree) {
-  computeLayout(tree);
+  layout(tree);
+  allNodes = []; allEdges = [];
+  flatten(tree, null, 0);
 
-  // ── EDGES ──────────────────────────────
-  // Build edge list by re-traversing the tree with parent couple midpoint info
-  const edges = [];
-  function collectEdges(node, parentMidX, parentY, depth) {
-    const ln = layoutNodes.find(n => n.name === node.name && n.depth === depth);
-    if (!ln) return;
-    if (parentMidX !== null) {
-      const midY = (parentY + ln.y) / 2;
-      edges.push(`M${parentMidX},${parentY+PH/2} C${parentMidX},${midY} ${ln.x},${midY} ${ln.x},${ln.y-PH/2}`);
-    }
-    const marriages = node.marriages || [];
-    marriages.forEach((m,mi) => {
-      const mid = ln.coupleMids[mi];
-      (m.children||[]).forEach(c => collectEdges(c, mid, ln.y, depth+1));
-    });
-  }
-  collectEdges(tree, null, 0, 0);
+  // edges
+  gL.selectAll('.edge').data(allEdges).join('path').attr('class','edge').attr('d',d=>d);
 
-  gL.selectAll('.lk').data(edges).join('path')
-    .attr('class','lk link').attr('d', d=>d);
-
-  // ── NODES ──────────────────────────────
-  const nSel = gN.selectAll('.ng')
-    .data(layoutNodes, d => d.name + d.x + d.y)
+  // nodes
+  gN.selectAll('.ng').data(allNodes, d=>d.name+':'+d._x+','+d._y)
     .join(enter => {
       const g = enter.append('g').attr('class','ng')
-        .attr('transform', d=>`translate(${d.x},${d.y})`);
+        .attr('transform', d=>`translate(${d._x},${d._y})`);
 
-      // Person card
-      g.append('rect')
-        .attr('class', d=>'p-card'+(d.depth===0?' root':''))
-        .attr('x',-PW/2).attr('y',-PH/2)
-        .attr('width',PW).attr('height',PH).attr('rx',6)
+      // person card
+      g.append('rect').attr('class', d=>'pc'+(d.depth===0?' root':''))
+        .attr('x',-PW/2).attr('y',-PH/2).attr('width',PW).attr('height',PH).attr('rx',6)
         .on('mouseenter', showTip).on('mouseleave', hideTip);
 
-      // Person name
-      g.append('text')
-        .attr('class', d=>'n-name'+(d.depth===0?' root':''))
+      // person name
+      g.append('text').attr('class',d=>'nm'+(d.depth===0?' root':''))
         .attr('text-anchor','middle').attr('x',0).attr('y',0)
         .text(d=>trunc(d.name,12));
 
-      // Spouses
+      // marriages
       g.each(function(d) {
         const sel = d3.select(this);
-        const hasMulti = d.marriages.filter(m=>m.spouse).length > 1;
-        d.marriages.forEach((m,mi) => {
-          if (!m.spouse) return;
-          const ox = d.spouseOffsets[mi];
-          // connector line
-          sel.append('line').attr('class','couple-bar')
+        const multi = d.marriages.length > 1;
+
+        d.marriages.forEach((m, mi) => {
+          const spx = d._spouseX[mi];
+          const relX = spx - d._x; // relative to node center
+          const isUnknown = m.spouse === null;
+          const isRoot = d.depth === 0;
+
+          // connector bar
+          sel.append('line').attr('class','cbar')
             .attr('x1',PW/2).attr('y1',0)
-            .attr('x2',ox-SW/2).attr('y2',0);
+            .attr('x2',relX-SW/2).attr('y2',0);
+
           // spouse card
           sel.append('rect')
-            .attr('class','s-card'+(d.depth===0?' root':''))
-            .attr('x',ox-SW/2).attr('y',-SH/2)
+            .attr('class', `sc ${isUnknown?'unknown':'known'}${isRoot?' root':''}`)
+            .attr('x',relX-SW/2).attr('y',-SH/2)
             .attr('width',SW).attr('height',SH).attr('rx',5)
-            .on('mouseenter', (_,dd)=>showTip(_, d))
-            .on('mouseleave', hideTip);
-          // badge
-          if (hasMulti) {
-            sel.append('text').attr('class','m-label')
-              .attr('x',ox-SW/2+3).attr('y',-SH/2+7)
+            .on('mouseenter',(_,dd)=>showTip(_,d)).on('mouseleave',hideTip);
+
+          // marriage badge
+          if (multi) {
+            sel.append('text').attr('class','ml')
+              .attr('x',relX-SW/2+3).attr('y',-SH/2+6.5)
               .text((mi+1)+'°');
           }
+
           // spouse name
           sel.append('text')
-            .attr('class','s-name'+(d.depth===0?' root':''))
-            .attr('text-anchor','middle')
-            .attr('x',ox).attr('y', hasMulti ? 3 : 0)
-            .text(trunc(m.spouse,9));
+            .attr('class',`sn${isRoot?' root':''}${isUnknown?' unknown':''}`)
+            .attr('text-anchor','middle').attr('x',relX).attr('y', multi?3:0)
+            .text(isUnknown ? '(não identificada)' : trunc(m.spouse,9));
         });
       });
 
       return g;
-    });
+    })
+    .attr('transform', d=>`translate(${d._x},${d._y})`);
 
-  nSel.attr('transform', d=>`translate(${d.x},${d.y})`);
-
-  document.getElementById('nv').textContent = layoutNodes.length;
+  document.getElementById('nv').textContent = allNodes.length;
 }
 
-// ═══════════════════════════════════════════
-// 4. FIT VIEW
-// ═══════════════════════════════════════════
+// ─────────────────────────────────────────────────────────
+// FIT
+// ─────────────────────────────────────────────────────────
 function fit() {
   const el = document.getElementById('cv');
-  const W = el.clientWidth, H = el.clientHeight - 46;
-  const ns = layoutNodes;
-  if (!ns.length) return;
-  const xMin = Math.min(...ns.map(n=>n.x-PW/2)) - 16;
-  const xMax = Math.max(...ns.map(n => {
-    const lastOx = n.spouseOffsets.filter(Boolean).pop();
-    return lastOx ? n.x + lastOx + SW/2 : n.x + PW/2;
-  })) + 16;
-  const yMin = Math.min(...ns.map(n=>n.y)) - PH/2 - 16;
-  const yMax = Math.max(...ns.map(n=>n.y)) + PH/2 + 24;
-  const sc = Math.min(W/(xMax-xMin), H/(yMax-yMin), 1.5);
+  const W = el.clientWidth, H = el.clientHeight-46;
+  if (!allNodes.length) return;
+  let xMin=Infinity, xMax=-Infinity, yMin=Infinity, yMax=-Infinity;
+  allNodes.forEach(n => {
+    xMin = Math.min(xMin, n._x-PW/2);
+    const lastSpX = n._spouseX.length ? n._spouseX[n._spouseX.length-1]+SW/2 : n._x+PW/2;
+    xMax = Math.max(xMax, lastSpX);
+    yMin = Math.min(yMin, n._y-PH/2);
+    yMax = Math.max(yMax, n._y+PH/2);
+  });
+  const pad = 24;
+  const sc = Math.min(W/(xMax-xMin+pad*2), H/(yMax-yMin+pad*2), 1.6);
   const tx = W/2 - sc*(xMin+xMax)/2;
   const ty = H/2 - sc*(yMin+yMax)/2;
-  svgEl.transition().duration(600)
-    .call(zoomB.transform, d3.zoomIdentity.translate(tx,ty).scale(sc));
+  svgEl.transition().duration(580).call(zoomB.transform, d3.zoomIdentity.translate(tx,ty).scale(sc));
 }
 
-// ═══════════════════════════════════════════
-// 5. SEARCH
-// ═══════════════════════════════════════════
-let sTimer;
+// ─────────────────────────────────────────────────────────
+// SEARCH
+// ─────────────────────────────────────────────────────────
+let stimer;
 function onSearch(e) {
-  clearTimeout(sTimer);
-  sTimer = setTimeout(() => {
+  clearTimeout(stimer);
+  stimer = setTimeout(()=>{
     const q = e.target.value.trim().toLowerCase();
-    const scEl = document.getElementById('sc');
+    const sc = document.getElementById('sc');
     if (!q) {
-      gN.selectAll('.p-card').classed('hi',false).classed('dim',false);
-      gN.selectAll('.n-name').classed('hi',false);
-      gN.selectAll('.s-card').classed('dim',false);
-      scEl.style.display='none'; return;
+      gN.selectAll('.pc').classed('hi',false).classed('dim',false);
+      gN.selectAll('.nm').classed('hi',false);
+      gN.selectAll('.sc').classed('dim',false);
+      sc.style.display='none'; return;
     }
-    let count=0, matched=[];
-    gN.selectAll('.ng').each(function(d) {
+    let cnt=0, hits=[];
+    gN.selectAll('.ng').each(function(d){
       const nm = d.name.toLowerCase().includes(q);
       const sm = d.marriages.some(m=>m.spouse&&m.spouse.toLowerCase().includes(q));
       const hit = nm||sm;
-      d3.select(this).select('.p-card').classed('hi',hit).classed('dim',!hit);
-      d3.select(this).select('.n-name').classed('hi',nm);
-      d3.select(this).selectAll('.s-card').classed('dim',!hit);
-      if (hit) { count++; matched.push(d); }
+      d3.select(this).select('.pc').classed('hi',hit).classed('dim',!hit);
+      d3.select(this).select('.nm').classed('hi',nm);
+      d3.select(this).selectAll('.sc').classed('dim',!hit);
+      if(hit){cnt++;hits.push(d);}
     });
-    scEl.style.display = count ? 'inline' : 'none';
-    scEl.textContent = count + (count===1?' resultado':' resultados');
-    if (!matched.length) return;
-    const el = document.getElementById('cv');
-    const W = el.clientWidth, H = el.clientHeight - 46;
-    if (matched.length === 1) {
-      const d = matched[0];
-      svgEl.transition().duration(450).call(
-        zoomB.transform, d3.zoomIdentity.translate(W/2-d.x*1.6, H/2-d.y*1.6).scale(1.6)
-      );
+    sc.style.display = cnt?'inline':'none';
+    sc.textContent = cnt+(cnt===1?' resultado':' resultados');
+    if (!hits.length) return;
+    const el=document.getElementById('cv');
+    const W=el.clientWidth, H=el.clientHeight-46;
+    if (hits.length===1) {
+      const d=hits[0];
+      svgEl.transition().duration(420).call(zoomB.transform,
+        d3.zoomIdentity.translate(W/2-d._x*1.6, H/2-d._y*1.6).scale(1.6));
     } else {
-      const xs=matched.map(d=>d.x), ys=matched.map(d=>d.y);
-      const sc2=Math.min(W/(Math.max(...xs)-Math.min(...xs)+200),H/(Math.max(...ys)-Math.min(...ys)+120),2);
-      svgEl.transition().duration(500).call(
-        zoomB.transform, d3.zoomIdentity
-          .translate(W/2-sc2*(Math.min(...xs)+Math.max(...xs))/2, H/2-sc2*(Math.min(...ys)+Math.max(...ys))/2)
-          .scale(sc2)
-      );
+      const xs=hits.map(d=>d._x), ys=hits.map(d=>d._y);
+      const s=Math.min(W/(Math.max(...xs)-Math.min(...xs)+220),H/(Math.max(...ys)-Math.min(...ys)+140),2.2);
+      svgEl.transition().duration(480).call(zoomB.transform,
+        d3.zoomIdentity.translate(W/2-s*(Math.min(...xs)+Math.max(...xs))/2,
+          H/2-s*(Math.min(...ys)+Math.max(...ys))/2).scale(s));
     }
-  }, 180);
+  },160);
 }
 
-// ═══════════════════════════════════════════
-// 6. TOOLTIP
-// ═══════════════════════════════════════════
-function showTip(e, d) {
-  document.getElementById('tip-name').textContent = d.name;
-  let rows = '';
-  d.marriages.forEach((m,i) => {
-    const multi = d.marriages.filter(x=>x.spouse).length > 1;
-    if (m.spouse) rows += `<div><span>♥</span> ${m.spouse}${multi?' ('+(i+1)+'°)':''}</div>`;
-    if (m.children?.length) rows += `<div>${m.children.length} filho(s)</div>`;
+// ─────────────────────────────────────────────────────────
+// TOOLTIP
+// ─────────────────────────────────────────────────────────
+function showTip(e,d){
+  document.getElementById('tn').textContent=d.name;
+  let rows='';
+  d.marriages.forEach((m,i)=>{
+    const multi=d.marriages.length>1;
+    const sp=m.spouse?m.spouse:'(cônjuge não identificado/a)';
+    rows+=`<div><span>♥</span> ${sp}${multi?' <em style="font-size:.65rem">'+(i+1)+'° casamento</em>':''}</div>`;
+    if(m.children.length) rows+=`<div>${m.children.length} filho(s)</div>`;
   });
-  rows += `<div>${GENS[d.depth]||''}</div>`;
-  document.getElementById('tip-rows').innerHTML = rows;
+  rows+=`<div>${GENS[d.depth]||''}</div>`;
+  document.getElementById('tr').innerHTML=rows;
   document.getElementById('tip').classList.add('on');
-  moveTip(e);
+  mvtip(e);
 }
-function hideTip() { document.getElementById('tip').classList.remove('on') }
-document.addEventListener('mousemove', e => {
-  if (document.getElementById('tip').classList.contains('on')) moveTip(e);
-});
-function moveTip(e) {
-  const t = document.getElementById('tip');
-  t.style.left = Math.min(e.clientX+12, window.innerWidth-195)+'px';
-  t.style.top  = Math.min(e.clientY-6,  window.innerHeight-120)+'px';
+function hideTip(){document.getElementById('tip').classList.remove('on')}
+document.addEventListener('mousemove',e=>{if(document.getElementById('tip').classList.contains('on'))mvtip(e)});
+function mvtip(e){
+  const t=document.getElementById('tip');
+  t.style.left=Math.min(e.clientX+12,window.innerWidth-196)+'px';
+  t.style.top=Math.min(e.clientY-6,window.innerHeight-130)+'px';
 }
 
-// ═══════════════════════════════════════════
-// HELPERS
-// ═══════════════════════════════════════════
-function trunc(s,n){ return s&&s.length>n ? s.slice(0,n-1)+'…' : s }
+// ─────────────────────────────────────────────────────────
+function trunc(s,n){return s&&s.length>n?s.slice(0,n-1)+'…':s}
 
-// ═══════════════════════════════════════════
+// ─────────────────────────────────────────────────────────
 // BOOT
-// ═══════════════════════════════════════════
-(async () => {
-  try {
+// ─────────────────────────────────────────────────────────
+(async()=>{
+  try{
     initSVG();
-    const tree = await loadExcel();
-    document.getElementById('loading').style.display = 'none';
+    const tree=await loadTree();
+    document.getElementById('loading').style.display='none';
     render(tree);
-    setTimeout(fit, 60);
-    document.getElementById('b-fit').onclick = fit;
-    document.getElementById('search').addEventListener('input', onSearch);
-  } catch(err) {
-    document.getElementById('loading').innerHTML =
-      `<div style="color:#c0392b;font-size:.85rem;text-align:center;padding:20px">
-        Erro ao carregar o Excel.<br>
-        <small style="color:#888">Certifique-se que <b>arvoreabreu.xlsx</b> está na mesma pasta que o index.html</small>
+    setTimeout(fit,80);
+    document.getElementById('bfit').onclick=fit;
+    document.getElementById('search').addEventListener('input',onSearch);
+  }catch(err){
+    document.getElementById('loading').innerHTML=
+      `<div style="color:#c0392b;font-size:.83rem;text-align:center;padding:24px;max-width:320px">
+        Erro ao carregar o Excel.<br><br>
+        <small style="color:#888">Certifique-se que <b>arvoreabreu.xlsx</b> está na mesma pasta que o index.html e que você está acessando via servidor (não abrindo o arquivo direto).</small>
       </div>`;
     console.error(err);
   }
